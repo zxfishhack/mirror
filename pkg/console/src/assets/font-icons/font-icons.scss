@@ -1,0 +1,120 @@
+/* icons */
+.iconList li:before{
+  content:'\e801';
+  font-family: 'custom-icons';
+  font-size: 10px;
+  text-align: left;
+  padding: 0;
+  margin:0;
+  display:inline-block;
+  margin-right:10px;
+  line-height:1em;
+}
+.iconList li {padding:5px;}
+
+/*** icons ***/
+
+.iconRounded{
+  border-radius:50%;
+  width: 40px;
+  height: 40px;
+  display: block;
+  text-align: center;
+  font-size:18px;
+}
+
+.iconRounded:before{margin: auto;text-align: center; line-height: 40px; }
+
+.iconBig{
+  font-size: 40px;
+}
+
+.iconBig.iconRounded{
+  width:100px;
+  height: 100px;
+}
+
+.iconBig.iconRounded:before{
+  line-height: 100px;
+}
+
+.iconMedium {
+  font-size: 33px;
+}
+
+.iconMedium.iconRounded{
+  width: 66px;
+  height: 66px;
+}
+
+.iconMedium.iconRounded:before{
+  line-height: 66px;
+}
+
+.iconSmall:before {
+  font-size: 10px;
+}
+
+.iconSmall.iconRounded{
+  width: 26px;
+  height: 26px;
+}
+
+.iconSmall.iconRounded:before{
+  line-height: 26px;
+}
+
+/*** icon Headings ***/
+.iconBlocHeading {position:relative; padding-left:55px;}
+.iconBlocHeading i{position:absolute; left:0;}
+.iconBlocHeading h2{display: block; font-size:18px; font-weight: 400; padding-top: 5px;}
+.iconBlocHeading h2:after{content:none;}
+.iconBlocHeading h3{display: block;}
+
+/* box icons */
+.boxIcon a{
+  padding:33px;
+  text-align: center;
+  display: block;
+  margin-bottom:11px;
+  -webkit-transition: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  -ms-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+}
+
+.boxIcon a i, .boxIcon a .imgBorder{
+  -webkit-transition: all 0.3s ease-out;
+  -moz-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  -ms-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+  -webkit-backface-visibility: hidden;
+}
+.boxIcon i {margin: 36px auto; display: block; border-radius:50%;}
+.boxIcon h2 {font-size: 18px; font-weight: 400; margin-bottom: 16px;}
+.boxIcon p {margin: 0;}
+
+.boxIcon a:hover{text-decoration:none; }
+
+.boxIcon a:hover i{
+  border: 25px solid #F7F7F7;
+  width: 150px;
+  height: 150px;
+  margin:11px auto;
+}
+
+.iconRounded {
+  color: $default;
+  border: 1px dashed $default;
+}
+.iconRounded:hover, .color1 .iconRounded:hover, .boxIcon a:hover i{
+  background-color: $highlight;
+  color:#fff;
+  text-shadow: 0 0 5px #FFF;
+  border-style: solid;
+}
+
+
+@import "custom-icons/css/custom-icons.css";

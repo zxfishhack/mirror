@@ -28,5 +28,5 @@ func (c *Handler) GetByWildcard(path string) error {
 }
 
 func Handle(app *mvc.Application) {
-
+	app.Handle(&Handler{})
 }

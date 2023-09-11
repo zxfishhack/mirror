@@ -17,6 +17,6 @@ type Rule struct {
 
 func (r *Rule) Normalize() {
 	r.Prefix = strings.Trim(r.Prefix, "/") + "/"
-	r.ReplacePrefixWith = strings.Trim(r.ReplacePrefixWith, "/") + "/"
+	r.ReplacePrefixWith = strings.Trim(r.ReplacePrefixWith, "/")
 	r.Upstream = strings.Trim(r.Upstream, "/") + "/"
 }

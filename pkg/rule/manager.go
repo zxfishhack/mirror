@@ -59,7 +59,8 @@ func (m *ManagerController) reconfigure() (err error) {
 		m.Data.app.Shutdown(context.Background())
 	}
 	m.Data.app = iris.New()
-	var updates []model.Rule
+	active := make([]snowflake.ID, 0)
+	inactive := make([]snowflake.ID, 0)
 	for rules.Next() {
 		var r model.Rule
 		if err = m.Data.db.ScanRows(rules, &r); err == nil {
@@ -68,25 +69,19 @@ func (m *ManagerController) reconfigure() (err error) {
 			if err != nil {
 				log.Printf("apply rule[%#v] failed %v", r, err)
 				err = nil
-				r.Active = false
-				m.Data.db.Model(&model.Rule{}).Where(model.Rule{ID: r.ID}).Updates(&r)
-				updates = append(updates, r)
+				inactive = append(inactive, r.ID)
 				continue
 			}
 			mvc.Configure(m.Data.app.Party(r.Prefix), func(app *mvc.Application) {
 				app.Handle(c)
 			})
-			r.Active = true
-			updates = append(updates, r)
+			active = append(active, r.ID)
 		} else {
 			break
 		}
 	}
-	tx := m.Data.db.Model(&model.Rule{}).Begin()
-	for _, r := range updates {
-		tx.Where(&model.Rule{ID: r.ID}).Updates(&r)
-	}
-	tx.Commit()
+	m.Data.db.Model(&model.Rule{}).Where("id IN ?", active).UpdateColumn("active", true)
+	m.Data.db.Model(&model.Rule{}).Where("id IN ?", inactive).UpdateColumn("active", false)
 	go m.Data.app.Run(iris.Addr(m.Data.addr),
 		iris.WithRemoteAddrHeader("X-Real-Ip"),
 		iris.WithoutRemoteAddrHeader("X-Forwarded-For"),
