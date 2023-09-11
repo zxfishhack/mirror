@@ -40,15 +40,15 @@ func newRule(r model.Rule, create storage.CreateStorageFunc) (c *RuleController,
 }
 
 func (r *RuleController) GetByWildcard(p string) (err error) {
-	p = path.Join(r.Data.ReplacePrefixWith, p)
-	b, err := r.Data.storage.Get(p)
+	lp := path.Join(r.Data.Prefix, p)
+	b, err := r.Data.storage.Get(lp)
 	for errors.Is(err, os.ErrNotExist) {
 		var u *url.URL
 		u, err = url.Parse(r.Data.Upstream)
 		if err != nil {
 			break
 		}
-		u.Path = path.Join(u.Path, p)
+		u.Path = path.Join(u.Path, r.Data.ReplacePrefixWith, p)
 		var resp *http.Response
 		resp, err = http.Get(u.String())
 		if err != nil {
@@ -63,7 +63,7 @@ func (r *RuleController) GetByWildcard(p string) (err error) {
 			r.Ctx.ContentType(resp.Header.Get("Content-Type"))
 			break
 		}
-		err = r.Data.storage.Put(p, b)
+		err = r.Data.storage.Put(lp, b)
 		if err != nil {
 			err = nil
 			break
@@ -71,7 +71,7 @@ func (r *RuleController) GetByWildcard(p string) (err error) {
 	}
 	if err == nil {
 		if r.Ctx.ResponseWriter().StatusCode() == http.StatusOK {
-			r.Ctx.ContentType(mime.TypeByExtension(filepath.Ext(p)))
+			r.Ctx.ContentType(mime.TypeByExtension(filepath.Ext(lp)))
 		}
 		_, err = r.Ctx.Write(b)
 		return err
