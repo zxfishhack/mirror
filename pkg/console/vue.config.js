@@ -77,7 +77,7 @@ module.exports = {
         },
         common: {
           name: "chunk-app",
-          test: /[\\/]src[\\/]/,
+          test: /[\\/]console[\\/]src[\\/]/,
           priority: 5,
         },
       },
