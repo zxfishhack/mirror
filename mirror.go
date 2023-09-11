@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/kataras/golog"
 	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/middleware/logger"
 	"github.com/kataras/iris/v12/middleware/recover"
 	"github.com/kataras/iris/v12/mvc"
 	"github.com/zxfishhack/mirror/pkg/console"
@@ -43,10 +45,13 @@ func main() {
 	}
 
 	app := iris.New()
+
+	app.Logger().SetLevel(golog.Levels[golog.InfoLevel].Name)
+	app.Use(recover.New())
+	app.Use(logger.New())
+
 	mvc.Configure(app.Party("/"), console.Handle)
 	mvc.Configure(app.Party("/"), rule.ManagerConfigure(addr, db, createFunc))
-
-	app.Use(recover.New())
 
 	var options []iris.Configurator
 
