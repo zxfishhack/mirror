@@ -28,6 +28,7 @@
         <template slot-scope="scope">
           <p>回源地址：{{ scope.row.upstream }}</p>
           <p>前缀替换：{{ scope.row.replacePrefixWith }}</p>
+          <p>代理服务器：{{scope.row.proxyUrl}}</p>
         </template>
       </el-table-column>
       <el-table-column prop="checkMD5" label="校验MD5" width="100">
@@ -54,7 +55,7 @@
       :visible.sync="show"
       :before-close="handleClose"
     >
-      <el-form>
+      <el-form :label-width="'100px'">
         <el-form-item label="文件名前缀">
           <el-input v-model="rule.prefix" />
         </el-form-item>
@@ -63,6 +64,9 @@
         </el-form-item>
         <el-form-item label="回源地址">
           <el-input v-model="rule.upstream" />
+        </el-form-item>
+        <el-form-item label="代理地址">
+          <el-input v-model="rule.proxyUrl" />
         </el-form-item>
         <el-form-item label="前缀替换">
           <el-input v-model="rule.replacePrefixWith" />
@@ -92,6 +96,7 @@ const emptyRule: Rule = {
   prefix: "",
   replacePrefixWith: "",
   upstream: "",
+  proxyUrl: "",
 };
 
 @Component
@@ -121,17 +126,27 @@ export default class ConfigView extends Vue {
   }
 
   async confirmAddOrEdit() {
-    if (this.editing) {
-      await Service.editRule(this.rule);
-    } else {
-      await Service.addRule(this.rule);
+    try {
+      if (this.editing) {
+        await Service.editRule(this.rule);
+      } else {
+        await Service.addRule(this.rule);
+      }
+      this.$message.error(`添加/修改成功`)
+    } catch (e) {
+      this.$message.error(`添加/修改失败：${e}`)
     }
     await this.loadData();
     this.show = false;
   }
 
   async activeRules() {
-    await Service.activeRules();
+    try {
+      await Service.activeRules();
+      this.$message.success(`生效规则成功。`)
+    } catch (e) {
+      this.$message.error(`生效规则失败：${e}`)
+    }
     await this.loadData();
   }
 

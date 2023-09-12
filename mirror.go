@@ -13,6 +13,7 @@ import (
 	"github.com/zxfishhack/mirror/pkg/rule"
 	"github.com/zxfishhack/mirror/pkg/storage"
 	"github.com/zxfishhack/mirror/pkg/storage/simple"
+	"log"
 )
 
 //go:generate go-bindata -pkg console -prefix "pkg/console/dist" -o pkg/console/assets.go pkg/console/dist/...
@@ -20,12 +21,19 @@ import (
 func main() {
 	var storagePath, internalPath, storageType, addr string
 	var consoleAddr string
+	var showHelp bool
 	flag.StringVar(&storagePath, "f", "/files", "mirror files dir")
 	flag.StringVar(&internalPath, "s", "/data", "internal storage dir")
 	flag.StringVar(&storageType, "type", "simple", "storage type: simple")
 	flag.StringVar(&addr, "l", ":80", "listen address")
 	flag.StringVar(&consoleAddr, "console", ":8080", "console listen address")
+	flag.BoolVar(&showHelp, "h", false, "show this help")
 	flag.Parse()
+
+	if showHelp {
+		flag.PrintDefaults()
+		return
+	}
 
 	var createFunc storage.CreateStorageFunc
 
@@ -57,5 +65,6 @@ func main() {
 
 	options = append(options, iris.WithoutServerError(iris.ErrServerClosed))
 
-	app.Run(iris.Addr(consoleAddr), options...)
+	err = app.Run(iris.Addr(consoleAddr), options...)
+	log.Print(err)
 }

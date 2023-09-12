@@ -9,6 +9,7 @@ type Rule struct {
 	ID                snowflake.ID `gorm:"primaryKey" json:"id"`
 	Prefix            string       `gorm:"unique" json:"prefix"`
 	Postfix           string       `json:"postfix"`
+	ProxyUrl          string       `json:"proxyUrl"`
 	ReplacePrefixWith string       `json:"replacePrefixWith"`
 	Upstream          string       `json:"upstream"`
 	CheckMD5          bool         `json:"checkMD5"`

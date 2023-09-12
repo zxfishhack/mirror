@@ -6,4 +6,5 @@ interface Rule {
   upstream: string;
   checkMD5: boolean;
   active: boolean;
+  proxyUrl: string;
 }
