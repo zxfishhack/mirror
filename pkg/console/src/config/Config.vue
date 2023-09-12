@@ -132,7 +132,7 @@ export default class ConfigView extends Vue {
       } else {
         await Service.addRule(this.rule);
       }
-      this.$message.error(`添加/修改成功`)
+      this.$message.success(`添加/修改成功`)
     } catch (e) {
       this.$message.error(`添加/修改失败：${e}`)
     }

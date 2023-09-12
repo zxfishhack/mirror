@@ -72,7 +72,7 @@ func (m *ManagerController) reconfigure() (err error) {
 				inactive = append(inactive, r.ID)
 				continue
 			}
-			mvc.Configure(m.Data.app.Party(r.Prefix), func(app *mvc.Application) {
+			mvc.Configure(m.Data.app.Party(utils.String(r.Prefix)), func(app *mvc.Application) {
 				app.Handle(c)
 			})
 			active = append(active, r.ID)

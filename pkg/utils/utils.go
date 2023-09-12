@@ -28,3 +28,21 @@ func init() {
 func ID() snowflake.ID {
 	return idGen.Generate()
 }
+
+func String(v *string) string {
+	if v == nil {
+		return ""
+	}
+	return *v
+}
+
+func StringP(v string) *string {
+	return &v
+}
+
+func Bool(v *bool) bool {
+	if v == nil {
+		return false
+	}
+	return *v
+}

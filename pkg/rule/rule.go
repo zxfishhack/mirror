@@ -8,6 +8,7 @@ import (
 	"github.com/kataras/iris/v12"
 	"github.com/zxfishhack/mirror/pkg/model"
 	"github.com/zxfishhack/mirror/pkg/storage"
+	"github.com/zxfishhack/mirror/pkg/utils"
 	"io"
 	"mime"
 	"net"
@@ -32,7 +33,7 @@ type RuleController struct {
 }
 
 func newRule(r model.Rule, create storage.CreateStorageFunc) (c *RuleController, err error) {
-	s, err := create(r.Prefix)
+	s, err := create(utils.String(r.Prefix))
 	if err != nil {
 		return
 	}
@@ -48,8 +49,8 @@ func newRule(r model.Rule, create storage.CreateStorageFunc) (c *RuleController,
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 	}
-	if r.ProxyUrl != "" {
-		if u, e := url.Parse(r.ProxyUrl); e == nil {
+	if utils.String(r.ProxyUrl) != "" {
+		if u, e := url.Parse(utils.String(r.ProxyUrl)); e == nil {
 			transport.Proxy = http.ProxyURL(u)
 		}
 	}
@@ -65,18 +66,18 @@ func newRule(r model.Rule, create storage.CreateStorageFunc) (c *RuleController,
 }
 
 func (r *RuleController) GetByWildcard(p string) (err error) {
-	lp := path.Join(r.Data.Prefix, p)
+	lp := path.Join(utils.String(r.Data.Prefix), p)
 	b, err := r.Data.storage.Get(lp)
 	for errors.Is(err, os.ErrNotExist) {
-		if r.Data.Postfix != "" && !strings.HasSuffix(p, r.Data.Postfix) {
+		if utils.String(r.Data.Postfix) != "" && !strings.HasSuffix(p, utils.String(r.Data.Postfix)) {
 			break
 		}
 		var u *url.URL
-		u, err = url.Parse(r.Data.Upstream)
+		u, err = url.Parse(utils.String(r.Data.Upstream))
 		if err != nil {
 			break
 		}
-		u.Path = path.Join(u.Path, r.Data.ReplacePrefixWith, p)
+		u.Path = path.Join(u.Path, utils.String(r.Data.ReplacePrefixWith), p)
 		var resp *http.Response
 		resp, err = r.Data.clt.Get(u.String())
 		if err != nil {
@@ -91,7 +92,7 @@ func (r *RuleController) GetByWildcard(p string) (err error) {
 			r.Ctx.ContentType(resp.Header.Get("Content-Type"))
 			break
 		}
-		if r.Data.CheckMD5 {
+		if utils.Bool(r.Data.CheckMD5) {
 			if cmd5 := resp.Header.Get("content-md5"); cmd5 != "" {
 				h := md5.New()
 				h.Write(b)
@@ -113,7 +114,11 @@ func (r *RuleController) GetByWildcard(p string) (err error) {
 		if r.Ctx.ResponseWriter().StatusCode() == http.StatusOK {
 			r.Ctx.ContentType(mime.TypeByExtension(filepath.Ext(lp)))
 		}
-		_, err = r.Ctx.Write(b)
+		if r.Ctx.ClientSupportsGzip() {
+			_, err = r.Ctx.WriteGzip(b)
+		} else {
+			_, err = r.Ctx.Write(b)
+		}
 		return err
 	}
 	return nil
