@@ -117,6 +117,7 @@ func (m *ManagerController) PostRule() (err error) {
 		return
 	}
 	r.ID = utils.ID()
+	r.Active = utils.BoolP(false)
 	r.Normalize()
 	return m.Data.db.Model(&model.Rule{}).Create(&r).Error
 }
@@ -128,6 +129,7 @@ func (m *ManagerController) PostRuleBy(id int64) (err error) {
 		return
 	}
 	r.ID = snowflake.ID(id)
+	r.Active = utils.BoolP(false)
 	r.Normalize()
 	return m.Data.db.Model(&model.Rule{}).Where(&model.Rule{ID: r.ID}).Updates(&r).Error
 }

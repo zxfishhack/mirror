@@ -46,3 +46,7 @@ func Bool(v *bool) bool {
 	}
 	return *v
 }
+
+func BoolP(v bool) *bool {
+	return &v
+}
