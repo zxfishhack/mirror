@@ -114,7 +114,7 @@ func (r *RuleController) GetByWildcard(p string) (err error) {
 		if r.Ctx.ResponseWriter().StatusCode() == http.StatusOK {
 			r.Ctx.ContentType(mime.TypeByExtension(filepath.Ext(lp)))
 		}
-		if r.Ctx.ClientSupportsGzip() {
+		if r.Ctx.ClientSupportsGzip() && len(b) > 1024 {
 			_, err = r.Ctx.WriteGzip(b)
 		} else {
 			_, err = r.Ctx.Write(b)

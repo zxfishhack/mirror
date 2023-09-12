@@ -26,7 +26,7 @@ func (c *Handler) GetByWildcard(path string) (err error) {
 		}
 		// c.Ctx.ServeFile(path, false)
 		c.Ctx.ContentType(mt)
-		if c.Ctx.ClientSupportsGzip() {
+		if c.Ctx.ClientSupportsGzip() && len(b) > 1024 {
 			_, err = c.Ctx.WriteGzip(b)
 		} else {
 			_, err = c.Ctx.Write(b)
