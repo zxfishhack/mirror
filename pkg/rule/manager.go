@@ -4,7 +4,10 @@ import (
 	"context"
 	"errors"
 	"github.com/bwmarrin/snowflake"
+	"github.com/kataras/golog"
 	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/middleware/logger"
+	"github.com/kataras/iris/v12/middleware/recover"
 	"github.com/kataras/iris/v12/mvc"
 	"github.com/zxfishhack/mirror/pkg/model"
 	"github.com/zxfishhack/mirror/pkg/storage"
@@ -59,6 +62,9 @@ func (m *ManagerController) reconfigure() (err error) {
 		m.Data.app.Shutdown(context.Background())
 	}
 	m.Data.app = iris.New()
+	m.Data.app.Logger().SetLevel(golog.Levels[golog.InfoLevel].Name)
+	m.Data.app.Use(recover.New())
+	m.Data.app.Use(logger.New())
 	active := make([]snowflake.ID, 0)
 	inactive := make([]snowflake.ID, 0)
 	for rules.Next() {

@@ -121,7 +121,7 @@ func (r *RuleController) GetByWildcard(p string) (err error) {
 		}
 		return err
 	}
-	return nil
+	return
 }
 
 func defaultTransportDialContext(dialer *net.Dialer) func(context.Context, string, string) (net.Conn, error) {
