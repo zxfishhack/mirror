@@ -49,8 +49,11 @@ func newRule(r model.Rule, create storage.CreateStorageFunc) (c *RuleController,
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 	}
-	if utils.String(r.ProxyUrl) != "" {
-		if u, e := url.Parse(utils.String(r.ProxyUrl)); e == nil {
+	if pu := utils.String(r.ProxyUrl); pu != "" {
+		if !strings.HasPrefix(pu, "http") {
+			pu = "http://" + pu
+		}
+		if u, e := url.Parse(pu); e == nil {
 			transport.Proxy = http.ProxyURL(u)
 		}
 	}
@@ -78,8 +81,13 @@ func (r *RuleController) GetByWildcard(p string) (err error) {
 			break
 		}
 		u.Path = path.Join(u.Path, utils.String(r.Data.ReplacePrefixWith), p)
+		upstreamRequest := &http.Request{
+			Method: "GET",
+			URL:    u,
+			Header: r.Ctx.Request().Header,
+		}
 		var resp *http.Response
-		resp, err = r.Data.clt.Get(u.String())
+		resp, err = r.Data.clt.Do(upstreamRequest)
 		if err != nil {
 			break
 		}
@@ -111,7 +119,7 @@ func (r *RuleController) GetByWildcard(p string) (err error) {
 		}
 	}
 	if err == nil {
-		if r.Ctx.ResponseWriter().StatusCode() == http.StatusOK {
+		if r.Ctx.GetStatusCode() == http.StatusOK {
 			r.Ctx.ContentType(mime.TypeByExtension(filepath.Ext(lp)))
 		}
 		if r.Ctx.ClientSupportsGzip() && len(b) > 1024 {
