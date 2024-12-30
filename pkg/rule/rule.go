@@ -121,6 +121,7 @@ func (r *RuleController) GetByWildcard(p string) (err error) {
 	if err == nil {
 		if r.Ctx.GetStatusCode() == http.StatusOK {
 			r.Ctx.ContentType(mime.TypeByExtension(filepath.Ext(lp)))
+			r.Ctx.Header("Cache-Control", "public, max-age=604800")
 		}
 		if r.Ctx.ClientSupportsGzip() && len(b) > 1024 {
 			_, err = r.Ctx.WriteGzip(b)
